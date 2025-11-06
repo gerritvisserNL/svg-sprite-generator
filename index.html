@@ -3,34 +3,54 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>SVG Sprite Generator</title>
+    <meta
+      name="description"
+      content="Quickly generate an SVG sprite from multiple SVG files. Combine icons, copy the code, and download your optimized sprite.svg in seconds."
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;600&family=Fira+Mono&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="reset.css" />
     <link rel="stylesheet" href="styles.css" />
+    <title>SVG Sprite Generator</title>
   </head>
   <body>
     <div class="container">
-      <h1>SVG Sprite Generator</h1>
-
-      <label class="upload-label">
-        <input
-          type="file"
-          id="file-input"
-          webkitdirectory
-          multiple
-          accept=".svg"
-          hidden
+      <div class="header">
+        <img
+          src="/sprite-generator-logo-small.png"
+          alt="logo of SVG Sprite Generator"
+          width="49"
+          height="49"
         />
-        Select map with SVG-files
-      </label>
+        <h1>SVG Sprite Generator</h1>
+      </div>
 
-      <div id="file-count"></div>
-
-      <div class="controls">
-        <button id="generate" disabled>Generate sprite</button>
+      <!-- Upload Section -->
+      <div class="card upload-card">
+        <label class="upload-label">
+          <input
+            type="file"
+            id="file-input"
+            webkitdirectory
+            multiple
+            accept=".svg"
+            hidden
+          />
+          Select map with SVG files
+        </label>
+        <div id="file-count"></div>
+        <div class="controls">
+          <button id="generate" disabled>Generate sprite</button>
+        </div>
       </div>
 
       <!-- Sprite Code Section -->
-      <h3>Sprite Code</h3>
-      <div class="code-section">
+      <div class="card code-card">
+        <h3>Sprite Code</h3>
         <pre id="output" aria-live="polite"></pre>
         <div class="code-buttons">
           <button id="copy-sprite" disabled>Copy Sprite</button>
@@ -39,8 +59,8 @@
       </div>
 
       <!-- HTML Snippets Section -->
-      <h3>HTML Snippets</h3>
-      <div class="code-section">
+      <div class="card code-card">
+        <h3>HTML Snippets</h3>
         <pre id="html-output" aria-live="polite"></pre>
         <div class="code-buttons">
           <button id="copy-html" disabled>Copy HTML</button>
@@ -49,7 +69,7 @@
       </div>
 
       <!-- Preview Section -->
-      <div id="preview-section">
+      <div class="card preview-card">
         <h2>Preview</h2>
         <div id="preview" aria-live="polite"></div>
       </div>

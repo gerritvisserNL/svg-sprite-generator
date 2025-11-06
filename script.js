@@ -90,7 +90,7 @@ generateBtn.addEventListener("click", async () => {
     symbols.push(symbol);
 
     // --- HTML SNIPPET ---
-    const titleText = id.replace(/-/g, "").toLowerCase();
+    const titleText = id.replace(/-/g, " ").toLowerCase();
     const htmlSnippet = `
 <svg class="${id.toLowerCase()}" width="${width}" height="${height}" role="img">
   <title>${titleText}</title>
