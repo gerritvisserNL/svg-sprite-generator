@@ -3,17 +3,12 @@ const fileCount = document.querySelector("#file-count");
 const generateBtn = document.querySelector("#generate");
 const downloadBtn = document.querySelector("#download");
 const downloadHTMLBtn = document.querySelector("#download-html");
+const copyBtn = document.querySelector("#copy");
 const output = document.querySelector("#output");
-const htmlOutput = document.querySelector("#html-output");
 const preview = document.querySelector("#preview");
-const spriteContainer = document.querySelector("#sprite-container");
-
-const copySpriteBtn = document.querySelector("#copy-sprite");
-const copyHTMLBtn = document.querySelector("#copy-html");
 
 let svgFiles = [];
 
-// --- FILE INPUT HANDLING ---
 fileInput.addEventListener("change", (e) => {
   svgFiles = Array.from(e.target.files).filter((file) =>
     file.name.endsWith(".svg")
@@ -22,18 +17,17 @@ fileInput.addEventListener("change", (e) => {
   generateBtn.disabled = svgFiles.length === 0;
 });
 
-// --- GENERATE SPRITE ---
 generateBtn.addEventListener("click", async () => {
   const symbols = [];
   const htmlSnippets = [];
 
-  preview.innerHTML = ""; // Clear preview
-  spriteContainer.innerHTML = ""; // Clear previous sprite
-
   for (const file of svgFiles) {
     let text = await file.text();
+
+    // Remove xmlns from original text
     text = text.replace(/\s+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/g, "");
 
+    // Parse SVG
     const parser = new DOMParser();
     const doc = parser.parseFromString(text, "image/svg+xml");
     const svg = doc.querySelector("svg");
@@ -42,37 +36,46 @@ generateBtn.addEventListener("click", async () => {
     const width = svg.getAttribute("width") || "24";
     const height = svg.getAttribute("height") || "24";
 
+    // Ensure viewBox exists
     if (!svg.hasAttribute("viewBox")) {
       svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     }
 
-    // Normalize fill/stroke
+    // Update fill/stroke for all elements
     svg.querySelectorAll("*").forEach((el) => {
       const d = el.getAttribute("d") || "";
+
       if (el.tagName.toLowerCase() === "path") {
+        // Closed path: fill currentColor, remove stroke
         if (/[Zz]\s*$/.test(d)) {
           el.setAttribute("fill", "currentColor");
           el.removeAttribute("stroke");
         } else {
+          // Open path: fill none, stroke currentColor
           el.setAttribute("fill", "none");
           el.setAttribute("stroke", "currentColor");
         }
       }
 
+      // Override any remaining fill/stroke
       if (
         el.getAttribute("fill") &&
-        !["currentColor", "none"].includes(el.getAttribute("fill"))
+        el.getAttribute("fill") !== "currentColor" &&
+        el.getAttribute("fill") !== "none"
       ) {
         el.setAttribute("fill", "currentColor");
       }
+
       if (
         el.getAttribute("stroke") &&
-        !["currentColor", "none"].includes(el.getAttribute("stroke"))
+        el.getAttribute("stroke") !== "currentColor" &&
+        el.getAttribute("stroke") !== "none"
       ) {
         el.setAttribute("stroke", "currentColor");
       }
     });
 
+    // Remove any xmlns attributes
     svg
       .querySelectorAll("[xmlns]")
       .forEach((el) => el.removeAttribute("xmlns"));
@@ -81,50 +84,52 @@ generateBtn.addEventListener("click", async () => {
     const inner = svg.innerHTML.trim();
     const id = file.name.replace(".svg", "");
 
-    // --- SYMBOL ---
+    // Build <symbol> for sprite
     const symbol = `
   <!-- ${id.replace(/-/g, " ")} -->
   <symbol id="${id}" viewBox="${svg.getAttribute("viewBox")}">
     ${inner}
-  </symbol>`;
+  </symbol>
+`;
     symbols.push(symbol);
 
-    // --- HTML SNIPPET ---
-    const titleText = id.replace(/-/g, "").toLowerCase();
+    // Build <svg> HTML snippet
     const htmlSnippet = `
-<svg class="${id.toLowerCase()}" width="${width}" height="${height}" role="img">
-  <title>${titleText}</title>
-  <use href="images/sprite.svg#${id.toLowerCase()}"></use>
-</svg>`;
+<svg class="${id}" width="${width}" height="${height}" role="img">
+  <title>${id.charAt(0).toUpperCase() + id.slice(1)}</title>
+  <use href="images/sprite.svg#${id}"></use>
+</svg>
+`;
     htmlSnippets.push(htmlSnippet.trim());
-
-    // --- PREVIEW ---
-    const div = document.createElement("div");
-    div.classList.add("preview-icon");
-    div.innerHTML = `
-      <svg><use href="#${id}"></use></svg>
-      <span>${id}</span>`;
-    preview.appendChild(div);
   }
 
-  // --- BUILD SPRITE ---
+  // Build sprite
   const sprite = `<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
 ${symbols.join("\n")}
 </svg>`;
 
-  // Plaats sprite in DOM
-  spriteContainer.innerHTML = sprite;
-
-  // --- OUTPUT ---
   output.textContent = sprite;
-  htmlOutput.textContent = htmlSnippets.join("\n\n");
-
   downloadBtn.disabled = false;
   downloadHTMLBtn.disabled = false;
-  copySpriteBtn.disabled = false;
-  copyHTMLBtn.disabled = false;
 
-  // --- DOWNLOAD SPRITE ---
+  // Build preview
+  preview.innerHTML = "";
+  const spriteContainer = document.createElement("div");
+  spriteContainer.innerHTML = sprite;
+  document.body.appendChild(spriteContainer);
+
+  for (const file of svgFiles) {
+    const id = file.name.replace(".svg", "");
+    const div = document.createElement("div");
+    div.classList.add("preview-icon");
+    div.innerHTML = `
+      <svg><use href="#${id}"></use></svg>
+      <span>${id}</span>
+    `;
+    preview.appendChild(div);
+  }
+
+  // Download sprite.svg
   downloadBtn.onclick = () => {
     const blob = new Blob([sprite], { type: "image/svg+xml" });
     const url = URL.createObjectURL(blob);
@@ -135,7 +140,7 @@ ${symbols.join("\n")}
     URL.revokeObjectURL(url);
   };
 
-  // --- DOWNLOAD HTML ---
+  // Download svg.html
   downloadHTMLBtn.onclick = () => {
     const htmlContent = `<!-- SVG Snippets for embedding icons -->\n\n${htmlSnippets.join(
       "\n\n"
@@ -147,27 +152,5 @@ ${symbols.join("\n")}
     a.download = "svg.html";
     a.click();
     URL.revokeObjectURL(url);
-  };
-
-  // --- COPY SPRITE ---
-  copySpriteBtn.onclick = async () => {
-    try {
-      await navigator.clipboard.writeText(output.textContent);
-      copySpriteBtn.textContent = "Copied!";
-      setTimeout(() => (copySpriteBtn.textContent = "Copy Sprite"), 2000);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // --- COPY HTML SNIPPETS ---
-  copyHTMLBtn.onclick = async () => {
-    try {
-      await navigator.clipboard.writeText(htmlOutput.textContent);
-      copyHTMLBtn.textContent = "Copied!";
-      setTimeout(() => (copyHTMLBtn.textContent = "Copy HTML"), 2000);
-    } catch (err) {
-      console.error(err);
-    }
   };
 });

@@ -24,7 +24,9 @@ body {
   max-width: 96%;
 }
 
-h1 {
+h1,
+h2,
+h3 {
   margin-top: 0;
   text-align: center;
 }
@@ -66,18 +68,38 @@ button:disabled {
   cursor: not-allowed;
 }
 
+#copy-sprite.copied,
+#copy-html.copied {
+  background: #22c55e;
+  transition: background 0.3s;
+}
+
 pre {
   background: #f0f0f0;
   padding: 1rem;
   border-radius: 8px;
   max-height: 220px;
+  width: 100%;
   overflow: auto;
   white-space: pre-wrap;
   word-wrap: break-word;
   margin-top: 1rem;
 }
 
-/* preview */
+.code-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.code-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
 #preview-section {
   display: flex;
   flex-direction: column;
