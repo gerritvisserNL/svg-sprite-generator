@@ -11,6 +11,11 @@ const spriteContainer = document.querySelector("#sprite-container");
 const copySpriteBtn = document.querySelector("#copy-sprite");
 const copyHTMLBtn = document.querySelector("#copy-html");
 
+// Select hidden result sections
+const resultSections = document.querySelectorAll(
+  ".code-card.hidden, .preview-card.hidden"
+);
+
 let svgFiles = [];
 
 // --- FILE INPUT HANDLING ---
@@ -27,8 +32,8 @@ generateBtn.addEventListener("click", async () => {
   const symbols = [];
   const htmlSnippets = [];
 
-  preview.innerHTML = ""; // Clear preview
-  spriteContainer.innerHTML = ""; // Clear previous sprite
+  preview.innerHTML = ""; // Clear preview section
+  spriteContainer.innerHTML = ""; // Clear previous sprite from DOM
 
   for (const file of svgFiles) {
     let text = await file.text();
@@ -42,11 +47,12 @@ generateBtn.addEventListener("click", async () => {
     const width = svg.getAttribute("width") || "24";
     const height = svg.getAttribute("height") || "24";
 
+    // Add missing viewBox if not present
     if (!svg.hasAttribute("viewBox")) {
       svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     }
 
-    // Normalize fill/stroke
+    // Normalize fill and stroke attributes
     svg.querySelectorAll("*").forEach((el) => {
       const d = el.getAttribute("d") || "";
       if (el.tagName.toLowerCase() === "path") {
@@ -73,6 +79,7 @@ generateBtn.addEventListener("click", async () => {
       }
     });
 
+    // Remove xmlns attributes
     svg
       .querySelectorAll("[xmlns]")
       .forEach((el) => el.removeAttribute("xmlns"));
@@ -81,7 +88,7 @@ generateBtn.addEventListener("click", async () => {
     const inner = svg.innerHTML.trim();
     const id = file.name.replace(".svg", "");
 
-    // --- SYMBOL ---
+    // --- CREATE SYMBOL ELEMENT ---
     const symbol = `
   <!-- ${id.replace(/-/g, " ")} -->
   <symbol id="${id}" viewBox="${svg.getAttribute("viewBox")}">
@@ -89,7 +96,7 @@ generateBtn.addEventListener("click", async () => {
   </symbol>`;
     symbols.push(symbol);
 
-    // --- HTML SNIPPET ---
+    // --- CREATE HTML SNIPPET ---
     const titleText = id.replace(/-/g, " ").toLowerCase();
     const htmlSnippet = `
 <svg class="${id.toLowerCase()}" width="${width}" height="${height}" role="img">
@@ -98,7 +105,7 @@ generateBtn.addEventListener("click", async () => {
 </svg>`;
     htmlSnippets.push(htmlSnippet.trim());
 
-    // --- PREVIEW ---
+    // --- PREVIEW ITEM ---
     const div = document.createElement("div");
     div.classList.add("preview-icon");
     div.innerHTML = `
@@ -107,15 +114,15 @@ generateBtn.addEventListener("click", async () => {
     preview.appendChild(div);
   }
 
-  // --- BUILD SPRITE ---
+  // --- BUILD SPRITE STRING ---
   const sprite = `<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
 ${symbols.join("\n")}
 </svg>`;
 
-  // Plaats sprite in DOM
+  // Inject sprite into DOM
   spriteContainer.innerHTML = sprite;
 
-  // --- OUTPUT ---
+  // --- UPDATE OUTPUTS ---
   output.textContent = sprite;
   htmlOutput.textContent = htmlSnippets.join("\n\n");
 
@@ -135,7 +142,7 @@ ${symbols.join("\n")}
     URL.revokeObjectURL(url);
   };
 
-  // --- DOWNLOAD HTML ---
+  // --- DOWNLOAD HTML SNIPPETS ---
   downloadHTMLBtn.onclick = () => {
     const htmlContent = `<!-- SVG Snippets for embedding icons -->\n\n${htmlSnippets.join(
       "\n\n"
@@ -149,7 +156,7 @@ ${symbols.join("\n")}
     URL.revokeObjectURL(url);
   };
 
-  // --- COPY SPRITE ---
+  // --- COPY SPRITE TO CLIPBOARD ---
   copySpriteBtn.onclick = async () => {
     try {
       await navigator.clipboard.writeText(output.textContent);
@@ -160,7 +167,7 @@ ${symbols.join("\n")}
     }
   };
 
-  // --- COPY HTML SNIPPETS ---
+  // --- COPY HTML SNIPPETS TO CLIPBOARD ---
   copyHTMLBtn.onclick = async () => {
     try {
       await navigator.clipboard.writeText(htmlOutput.textContent);
@@ -170,4 +177,7 @@ ${symbols.join("\n")}
       console.error(err);
     }
   };
+
+  // --- SHOW HIDDEN RESULT SECTIONS ---
+  resultSections.forEach((section) => section.classList.remove("hidden"));
 });

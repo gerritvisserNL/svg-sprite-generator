@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1"
+    />
     <meta
       name="description"
       content="Quickly generate an SVG sprite from multiple SVG files. Combine icons, copy the code, and download your optimized sprite.svg in seconds."
@@ -19,9 +22,10 @@
   </head>
   <body>
     <div class="container">
+      <!-- Header -->
       <div class="header">
         <img
-          src="/sprite-generator-logo-small.png"
+          src="sprite-generator-logo-small.webp"
           alt="logo of SVG Sprite Generator"
           width="49"
           height="49"
@@ -49,33 +53,33 @@
       </div>
 
       <!-- Sprite Code Section -->
-      <div class="card code-card">
+      <div class="card code-card hidden">
         <h3>Sprite Code</h3>
         <pre id="output" aria-live="polite"></pre>
         <div class="code-buttons">
-          <button id="copy-sprite" disabled>Copy Sprite</button>
           <button id="download" disabled>Download sprite.svg</button>
+          <button id="copy-sprite" disabled>Copy Sprite</button>
         </div>
       </div>
 
       <!-- HTML Snippets Section -->
-      <div class="card code-card">
+      <div class="card code-card hidden">
         <h3>HTML Snippets</h3>
         <pre id="html-output" aria-live="polite"></pre>
         <div class="code-buttons">
-          <button id="copy-html" disabled>Copy HTML</button>
           <button id="download-html" disabled>Download svg.html</button>
+          <button id="copy-html" disabled>Copy HTML</button>
         </div>
       </div>
 
       <!-- Preview Section -->
-      <div class="card preview-card">
+      <div class="card preview-card hidden">
         <h2>Preview</h2>
         <div id="preview" aria-live="polite"></div>
       </div>
 
-      <!-- Hidden sprite container for <use> references -->
-      <div id="sprite-container" style="display: none"></div>
+      <!-- Hidden sprite container -->
+      <div id="sprite-container" class="hidden"></div>
     </div>
 
     <script type="module" src="script.js"></script>

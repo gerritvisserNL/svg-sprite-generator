@@ -1,19 +1,16 @@
 /* ===============================
-   Root colors
+   Root colors & base
 =============================== */
 :root {
   --accent-blue: #3b82f6;
   --accent-blue-dark: #2563eb;
   --accent-green: #16a34a;
   --accent-green-dark: #15803d;
-  --neutral-bg: hsl(0, 0%, 98%);
+  --neutral-bg: rgb(245, 245, 245);
   --neutral-white: hsl(0, 0%, 100%);
   --neutral-dark: hsl(0, 0%, 15%);
 }
 
-/* ===============================
-   Base
-=============================== */
 html {
   font-size: 16px;
 }
@@ -21,37 +18,43 @@ html {
 body {
   display: flex;
   justify-content: center;
-  padding: 2rem;
   background-color: var(--neutral-bg);
   font-family: "Fira Sans", system-ui, sans-serif;
+  margin: 0;
+  padding: 1.5rem;
 }
 
 /* ===============================
-   Layout
+   Container layout
 =============================== */
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
-  width: 90%;
-  min-height: 100dvh;
-  max-width: 1000px;
+  gap: 1.5rem;
+  width: 100%;
+  min-width: 360px;
+  max-width: 1440px;
 }
 
 /* ===============================
-  Header   
+   Header layout
 =============================== */
 .header {
   display: flex;
-  flex-direction: row;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 1.4rem;
+  color: var(--neutral-dark);
 }
 
 /* ===============================
-   Card
+   Card style
 =============================== */
 .card {
   display: flex;
@@ -59,19 +62,20 @@ body {
   align-items: center;
   gap: 1rem;
   width: 100%;
-  padding: 1.5rem;
+  padding: 1.25rem;
   background-color: var(--neutral-white);
   border-radius: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* ===============================
-   Upload
+   Upload section
 =============================== */
 .upload-label {
-  display: inline-block;
-  width: 15rem;
-  padding: 1rem 1.5rem;
+  display: block;
+  width: 100%;
+  max-width: 18rem;
+  padding: 1rem;
   background-color: var(--accent-blue);
   color: white;
   font-weight: 600;
@@ -86,11 +90,15 @@ body {
 }
 
 /* ===============================
-   Buttons
+   Buttons (generate, download, copy)
 =============================== */
-button {
+button#generate,
+button#download,
+button#download-html,
+button#copy-sprite,
+button#copy-html {
   padding: 0.6rem 1rem;
-  background: var(--accent-green);
+  background-color: var(--accent-green);
   color: white;
   font-weight: 500;
   border: none;
@@ -99,21 +107,32 @@ button {
   transition: background 0.3s ease;
 }
 
-button:hover {
+button#generate:hover,
+button#download:hover,
+button#download-html:hover,
+button#copy-sprite:hover,
+button#copy-html:hover {
   background-color: var(--accent-green-dark);
 }
 
-button:disabled {
+button#generate:disabled,
+button#download:disabled,
+button#download-html:disabled,
+button#copy-sprite:disabled,
+button#copy-html:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-button.copied {
-  background: var(--accent-green);
+/* Fixed width for copy buttons */
+#copy-sprite,
+#copy-html {
+  width: 120px;
+  text-align: center;
 }
 
 /* ===============================
-   Controls
+   Controls & code-buttons
 =============================== */
 .controls,
 .code-buttons {
@@ -138,26 +157,28 @@ pre {
 }
 
 /* ===============================
-   Preview
+   Preview container (flexbox)
 =============================== */
 #preview {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-items: center;
-  align-items: center;
+  flex-wrap: wrap; /* allow icons to wrap to next line */
+  justify-content: center; /* center icons horizontally */
   gap: 1rem;
   padding: 1rem;
 }
 
+/* Each icon container */
 .preview-icon {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   padding: 0.5rem;
   border-radius: 12px;
   transition: background 0.3s ease;
+  flex: 1 0 40%; /* grow, shrink, initial width 40% for mobile */
+  max-width: 120px; /* prevents icons from becoming too wide */
+  min-width: 80px; /* prevents icons from becoming too small */
 }
 
 .preview-icon:hover {
@@ -167,4 +188,79 @@ pre {
 .preview-icon svg {
   width: 50px;
   height: 50px;
+}
+
+/* Hide result sections by default */
+.hidden {
+  display: none;
+}
+
+/* ===============================
+   Responsive adjustments
+=============================== */
+@media (min-width: 600px) {
+  .preview-icon {
+    flex: 1 0 30%;
+    max-width: 140px;
+  }
+
+  .header {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .container {
+    gap: 2rem;
+  }
+
+  .card {
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .preview-icon {
+    flex: 1 0 20%;
+    max-width: 160px;
+  }
+
+  .container {
+    width: 90%;
+  }
+
+  .header {
+    justify-content: flex-start;
+  }
+
+  body {
+    padding: 3rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .preview-icon {
+    flex: 1 0 15%;
+    max-width: 180px;
+  }
+
+  .preview-icon svg {
+    width: 60px;
+    height: 60px;
+  }
+
+  .container {
+    max-width: 1440px;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  pre {
+    max-height: 400px;
+  }
 }
